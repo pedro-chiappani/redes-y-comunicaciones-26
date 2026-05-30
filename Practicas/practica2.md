@@ -92,3 +92,69 @@
 	- El parámetro **–X** sirve para especificar un método para la petición cuando se comunica con el servidor HTTP. Este método se va a usar en vez del método que se tendría que utilizar (que por defecto es el GET).
 
 	- El parámetro **–s** sirve para ponerlo en modo silencioso, lo que hace que no muestre un medidor de progreso o mensajes de error. Aun así, va a mostrar la información que fue pedida, a menos que se redireccione.
+
+8. ## Ejecute el comando curl sin ningún parámetro adicional y acceda a *www.redes.unlp.edu.ar.* Luego responda:
+    - ### a. ¿Cuántos requerimientos realizó y qué recibió? Pruebe redirigiendo la salida (>) del comando curl a un archivo con extensión html y abrirlo con un navegador.
+
+        Realicé un único requerimiento y recibí el código en html del sitio. Cuando lo dirigí hacia un archivo html y lo ejecuté se abrió una página web de la materia.
+
+    - ### b. ¿Cómo funcionan los atributos href de los tags link e img en html?
+
+        El atributo href de los tags link e img en html se utiliza para especificar la URL del recurso al que se hace referencia. En el caso del tag link, se utiliza para enlazar un archivo CSS externo que contiene estilos para la página web. En el caso del tag img, se utiliza para especificar la URL de una imagen que se desea mostrar en la página web.
+
+        Cuando un navegador web encuentra un tag link con un atributo href, realiza un requerimiento HTTP para obtener el archivo CSS y aplicarlo a la página web. De manera similar, cuando encuentra un tag img con un atributo href, realiza un requerimiento HTTP para obtener la imagen y mostrarla en la página web.
+
+    - ### c. Para visualizar la página completa con imágenes como en un navegador, ¿alcanza con realizar un único requerimiento?
+
+        No, no se puede con un solo requerimiento. Se necesitan tantos requerimientos como archivos o imágenes quieran mostrarse en la página. Una página hace más de un requerimiento mientras que el curl solo hace uno solo a la URL especificada
+
+    - ### d. ¿Cuántos requerimientos serían necesarios para obtener una página que tiene dos CSS, dos Javascript y tres imágenes? Diferencie cómo funcionaría un navegador respecto al comando curl ejecutado previamente
+
+        Para obtener una página que tiene dos CSS, dos Javascript y tres imágenes serían necesarios 8 requerimientos: uno para la página HTML, dos para los archivos CSS, dos para los archivos Javascript y tres para las imágenes.
+
+        Un navegador web realiza múltiples requerimientos de forma automática para obtener todos los recursos necesarios para mostrar la página completa, mientras que el comando curl solo realiza un requerimiento a la URL especificada y no sigue los enlaces para obtener los recursos adicionales.
+
+9. ## Ejecute a continuación los siguientes comandos:
+    `curl -v -s www.redes.unlp.edu.ar > /dev/null`
+
+    `curl -I -v -s www.redes.unlp.edu.ar`
+
+    - ### a. ¿Qué diferencias nota entre cada uno?
+
+        El primer comando pide toda la página mientras que el segundo solo pide los Headers, es decir, el primero lo llama con un GET y el segundo con un HEAD.
+
+    - ### b. ¿Qué ocurre si en el primer comando se quita la redirección a /dev/null? ¿Por qué no es necesaria en el segundo comando?
+
+        Si se quitase la redirección, aparte de mostrar lo que le manda al servidor y lo que el servidor responde, mostraría el código de la página ya que está pidiendo la página con un GET. En cambio, el segundo comando lo está pidiendo con un HEAD por lo que solo va a devolver los Headers.
+
+    - ### c.  ¿Cuántas cabeceras viajaron en el requerimiento? ¿Y en la respuesta?
+
+        En el requerimiento de la página viajaron 4 cabeceras mientras que en la respuesta se recibieron 8 cabeceras.
+
+10. ## ¿Qué indica la cabecera Date?
+
+    La cabecera Date indica la fecha y hora en que el mensaje fue enviado. En el caso de un mensaje de requerimiento, indica la fecha y hora en que el cliente envió el mensaje al servidor. En el caso de un mensaje de respuesta, indica la fecha y hora en que el servidor envió el mensaje al cliente. Esta información es útil para sincronizar los relojes entre el cliente y el servidor, así como para fines de registro y depuración.
+
+11. ## En HTTP/1.0, ¿cómo sabe el cliente que ya recibió todo el objeto solicitado de manera completa? ¿Y en HTTP/1.1?
+
+    En HTTP/1.0, el cliente sabe que ha recibido todo el objeto solicitado de manera completa cuando la conexión se cierra después de enviar la respuesta. Esto se debe a que en HTTP/1.0, cada solicitud y respuesta se maneja en una conexión separada, por lo que el cierre de la conexión indica que se ha completado la transferencia del objeto.
+
+    En HTTP/1.1, el cliente puede saber que ha recibido todo el objeto solicitado de manera completa utilizando la cabecera Content-Length, que indica el tamaño del objeto en bytes. El cliente puede leer los datos hasta alcanzar el número de bytes especificado en esta cabecera para asegurarse de que ha recibido todo el objeto. Además, HTTP/1.1 también permite el uso de Transfer-Encoding: chunked, donde los datos se envían en fragmentos (chunks) y el final del objeto se indica con un chunk de tamaño cero.
+
+12. ## Investigue los distintos tipos de códigos de retorno de un servidor web y su significado. Considere que los mismos se clasifican en categorías (2XX, 3XX, 4XX, 5XX).
+
+    - **2XX**: Indica que la solicitud fue recibida, entendida y aceptada correctamente. Ejemplo: 200 OK, 201 Created.
+
+    - **3XX**: Indica que se requiere una acción adicional para completar la solicitud, generalmente una redirección. Ejemplo: 301 Moved Permanently, 302 Found.
+
+    - **4XX**: Indica un error del cliente, lo que significa que la solicitud no pudo ser procesada debido a un error en la sintaxis o en la solicitud. Ejemplo: 400 Bad Request, 404 Not Found.
+
+    - **5XX**: Indica un error del servidor, lo que significa que el servidor falló al procesar una solicitud válida. Ejemplo: 500 Internal Server Error, 503 Service Unavailable.
+
+13. ## Utilizando curl, realice un requerimiento con el método HEAD al sitio www.redes.unlp.edu.ar e indique:
+    - ### a. ¿Qué información brinda la primera línea de la respuesta?
+    - ### b. ¿Cuántos encabezados muestra la respuesta?
+    - ### c. ¿Qué servidor web está sirviendo la página?
+    - ### d. ¿El acceso a la página solicitada fue exitoso o no?
+    - ### e. ¿Cuándo fue la última vez que se modificó la página?
+    - ### f. Solicite la página nuevamente con curl usando GET, pero esta vez indique que quiere obtenerla sólo si la misma fue modificada en una fecha posterior a la que efectivamente fue modificada. ¿Cómo lo hace? ¿Qué resultado obtuvo? ¿Puede explicar para qué sirve?
