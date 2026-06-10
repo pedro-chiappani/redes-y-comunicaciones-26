@@ -153,8 +153,234 @@
 
 13. ## Utilizando curl, realice un requerimiento con el método HEAD al sitio www.redes.unlp.edu.ar e indique:
     - ### a. ¿Qué información brinda la primera línea de la respuesta?
+        La primera línea de la respuesta indica la versión del protocolo HTTP que se está utilizando, el código de estado de la respuesta y una frase descriptiva del código de estado. En este caso, la primera línea podría ser algo como: "HTTP/1.1 200 OK", lo que indica que se está utilizando HTTP/1.1, que la solicitud fue exitosa (código 200) y que el mensaje es "OK".
     - ### b. ¿Cuántos encabezados muestra la respuesta?
+        Muestra 8 encabezados en la respuesta.
+
+        - HTTP/1.1 200 OK
+        - **Date**: Wed, 10 Jun 2026 13:20:59 GMT
+        - **Server**: Apache/2.4.56 (Unix)
+        - **Last-Modified**: Sun, 19 Mar 2023 19:04:46 GMT
+        - **ETag**: "1322-5f7457bd64f80"
+        - **Accept-Ranges**: bytes
+        - **Content-Length**: 4898
+        - **Content-Type**: text/html
+
     - ### c. ¿Qué servidor web está sirviendo la página?
+
+        El servidor web que está sirviendo la página es Apache/2.4.56 (Unix).
+
     - ### d. ¿El acceso a la página solicitada fue exitoso o no?
+        El acceso a la página solicitada fue exitoso, ya que el código de estado en la primera línea de la respuesta es 200 OK, lo que indica que la solicitud fue procesada correctamente por el servidor y se pudo acceder a la página sin problemas.
+
     - ### e. ¿Cuándo fue la última vez que se modificó la página?
+        La última vez que se modificó la página fue el Sun, 19 Mar 2023 19:04:46 GMT, según lo indicado en el encabezado Last-Modified de la respuesta.
+
     - ### f. Solicite la página nuevamente con curl usando GET, pero esta vez indique que quiere obtenerla sólo si la misma fue modificada en una fecha posterior a la que efectivamente fue modificada. ¿Cómo lo hace? ¿Qué resultado obtuvo? ¿Puede explicar para qué sirve?
+        Para solicitar la página nuevamente con curl usando GET y obtenerla solo si fue modificada en una fecha posterior a la que efectivamente fue modificada, se puede utilizar el encabezado If-Modified-Since. El comando sería algo como:
+
+        `
+        curl -v -s -H "If-Modified-Since: Sun, 19 Mar 2023 19:04:46 GMT" www.redes.unlp.edu.ar
+        `
+
+        En este caso, el resultado obtenido sería una respuesta con el código de estado 304 Not Modified, lo que indica que la página no ha sido modificada desde la fecha especificada en el encabezado If-Modified-Since. Esto significa que el cliente puede seguir utilizando la versión en caché de la página sin necesidad de descargarla nuevamente.
+
+        Este mecanismo es útil para optimizar el uso del ancho de banda y mejorar el rendimiento, ya que permite a los clientes evitar descargar recursos innecesarios si no han cambiado desde la última vez que fueron solicitados.
+
+14. ## Utilizando curl, acceda al sitio www.redes.unlp.edu.ar/restringido/index.php y siga las instrucciones y las pistas que vaya recibiendo hasta obtener la respuesta final. Será de utilidad para resolver este ejercicio poder analizar tanto el contenido de cada página como los encabezados.
+
+    Para acceder al sitio www.redes.unlp.edu.ar/restringido/index.php, se puede utilizar el siguiente comando curl:
+
+    ```bash
+    curl www.redes.unlp.edu.ar/restringido/index.php
+    <h1>Acceso restringido</h1>
+
+    <p>Para acceder al contenido es necesario autenticarse. Para obtener los datos de acceso seguir las instrucciones detalladas en www.redes.unlp.edu.ar/obtener-usuario.php</p>
+    ```
+    ```bash
+    curl www.redes.unlp.edu.ar/obtener-usuario.php
+
+    <p>Para obtener el usuario y la contraseña haga un requerimiento a esta página seteando el encabezado 'Usuario-Redes' con el valor 'obtener'</p>
+    ```
+
+    ```bash
+    curl -H "Usuario-Redes:obtener" www.redes.unlp.edu.ar/obtener-usuario.php
+    <p>Bien hecho! Los datos para ingresar son:
+
+    Usuario: redes
+
+    Contraseña: RYC
+
+    Ahora vuelva a acceder a la página inicial con los datos anteriores.
+
+    PISTA: Investigue el uso del encabezado Authorization para el método Basic. El comando base64 puede ser de ayuda!</p>
+
+    ```
+
+    ```bash
+    echo "redes:RYC" | base64
+    cmVkZXM6UllDCg
+    ```
+
+    ```bash
+    curl -H "Authorization: Basic cmVkZXM6UllD" www.redes.unlp.edu.ar/restringido/index.php
+    <h1>Excelente!</h1>
+
+    <p>Para terminar el ejercicio deberás agregar en la entrega los datos que se muestran en la siguiente página.</p>
+    <p>ACLARACIÓN: la URL de la siguiente página está contenida en esta misma respuesta.</p>
+    ```
+
+    ```bash
+    curl -i -H "Authorization: Basic cmVkZXM6UllD" www.redes.unlp.edu.ar/restringido/index.php
+    HTTP/1.1 302 Found
+    Date: Wed, 10 Jun 2026 13:51:52 GMT
+    Server: Apache/2.4.56 (Unix)
+    X-Powered-By: PHP/7.4.33
+    Location: http://www.redes.unlp.edu.ar/restringido/the-end.php
+    Content-Length: 230
+    Content-Type: text/html; charset=UTF-8
+
+    <h1>Excelente!</h1>
+
+    <p>Para terminar el ejercicio deberás agregar en la entrega los datos que se muestran en la siguiente página.</p>
+    <p>ACLARACIÓN: la URL de la siguiente página está contenida en esta misma respuesta.</p>
+    ```
+
+    ```bash
+    curl -i -H "Authorization: Basic cmVkZXM6UllD" www.redes.unlp.edu.ar/restringido/the-end.php
+    HTTP/1.1 200 OK
+    Date: Wed, 10 Jun 2026 13:52:04 GMT
+    Server: Apache/2.4.56 (Unix)
+    X-Powered-By: PHP/7.4.33
+    Content-Length: 159
+    Content-Type: text/html; charset=UTF-8
+
+    ¡Felicitaciones, llegaste al final del ejercicio!
+
+    Fecha: 2026-06-10 13:52:04
+    Verificación: 3055d394d645eb2b2a8b608553252029a172e70c300dbab80d040f9d87460d8c
+    ```
+
+15. ## Utilizando la VM, realice las siguientes pruebas:
+    - ### a. Ejecute el comando ’curl www.redes.unlp.edu.ar/extras/prueba-http-1-0.txt’ y copie la salida completa (incluyendo los dos saltos de línea del final).
+
+        ```
+        GET /http/HTTP-1.1/ HTTP/1.0
+        User-Agent: curl/7.38.0
+        Host: www.redes.unlp.edu.ar
+        Accept: */*
+        ```
+
+    - ### b. Desde la consola ejecute el comando telnet www.redes.unlp.edu.ar 80 y luego pegue el contenido que tiene almacenado en el portapapeles. ¿Qué ocurre luego de hacerlo?
+
+        ```bash
+        telnet www.redes.unlp.edu.ar 80
+
+        Trying 172.28.0.50...
+        Connected to www.redes.unlp.edu.ar.
+        Escape character is '^]'.
+        GET /http/HTTP-1.1/ HTTP/1.0
+        User-Agent: curl/7.38.0
+        Host: www.redes.unlp.edu.ar
+        Accept: */*
+
+
+        HTTP/1.1 200 OK
+        Date: Wed, 10 Jun 2026 14:07:10 GMT
+        Server: Apache/2.4.56 (Unix)
+        Last-Modified: Sun, 19 Mar 2023 19:04:46 GMT
+        ETag: "760-5f7457bd64f80"
+        Accept-Ranges: bytes
+        Content-Length: 1888
+        Connection: close
+        Content-Type: text/html
+
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <title>Protocolo HTTP: versiones</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="description" content="">
+            <meta name="author" content="">
+
+            <!-- Le styles -->
+            <link href="../../bootstrap/css/bootstrap.css" rel="stylesheet">
+            <link href="../../css/style.css" rel="stylesheet">
+            <link href="../../bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+
+            <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+            <!--[if lt IE 9]>
+              <script src="./bootstrap/js/html5shiv.js"></script>
+            <![endif]-->
+          </head>
+
+          <body>
+
+
+            <div id="wrap">
+
+            <div class="navbar navbar-inverse navbar-fixed-top">
+              <div class="navbar-inner">
+                <div class="container">
+                  <a class="brand" href="../../index.html"><i class="icon-home icon-white"></i></a>
+                  <a class="brand" href="https://catedras.info.unlp.edu.ar" target="_blank">Redes y Comunicaciones</a>
+                  <a class="brand" href="http://www.info.unlp.edu.ar" target="_blank">Facultad de Inform&aacute;tica</a>
+                  <a class="brand" href="http://www.unlp.edu.ar" target="_blank">UNLP</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="container">
+            <h1>Ejemplo del protocolo HTTP 1.1</h1>
+            <p>
+                Esta p&aacute;gina se visualiza utilizando HTTP 1.1. Utilizando el capturador de paquetes analice cuantos flujos utiliza el navegador para visualizar la p&aacute;gina con sus im&aacute;genes en contraposici&oacute;n con el protocolo HTTP/1.0.
+            </p>
+            </p>
+            <h2>Imagen de ejemplo</h2>
+            <img src="13532-tuxkiller03green.png" width="800px"/>
+            </div>
+
+
+            </div>
+            <div id="footer">
+              <div class="container">
+                <p class="muted credit">Redes y Comunicaciones</p>
+              </div>
+            </div>
+          </body>
+        </html>
+        Connection closed by foreign host.
+        ```
+
+        Devuelve el código HTML de la página solicitada, lo que indica que el servidor ha procesado correctamente la solicitud y ha enviado la respuesta al cliente. Después de mostrar el contenido de la página, la conexión se cierra automáticamente debido a que se está utilizando HTTP/1.0, que no permite mantener la conexión abierta para múltiples solicitudes y respuestas.
+
+
+    - ### c. Repita el proceso anterior, pero copiando la salida del recurso /extras/prueba-http-1-1.txt. Verifique que debería poder pegar varias veces el mismo contenido sin tener que ejecutar el comando telnet nuevamente
+
+        Ahora la conexión se mantiene abierta, lo que permite pegar varias veces el mismo contenido sin tener que ejecutar el comando telnet nuevamente. Esto se debe a que el recurso solicitado utiliza HTTP/1.1, que permite mantener la conexión abierta para múltiples solicitudes y respuestas, a diferencia de HTTP/1.0, que cierra la conexión después de cada solicitud y respuesta.
+
+16. ## En base a lo obtenido en el ejercicio anterior, responda:
+    - ### a. ¿Qué está haciendo al ejecutar el comando telnet?
+        Al ejecutar el comando telnet, se establece una conexión TCP con el servidor web en el puerto 80, que es el puerto estándar para HTTP. Esto permite enviar manualmente solicitudes HTTP al servidor y recibir las respuestas correspondientes. En este caso, se está utilizando telnet para enviar solicitudes HTTP de forma manual y observar las respuestas del servidor, lo que es útil para entender cómo funciona el protocolo HTTP y para realizar pruebas de diagnóstico.
+    - ### b. ¿Qué método HTTP utilizó? ¿Qué recurso solicitó?
+        En el ejercicio anterior, se utilizó el método HTTP GET para solicitar el recurso /http/HTTP-1.1/. El método GET se utiliza para solicitar la representación de un recurso específico, en este caso, una página web o un archivo ubicado en el servidor. El recurso solicitado es la URL /http/HTTP-1.1/, que corresponde a una página que muestra un ejemplo del protocolo HTTP 1.1.
+    - ### c. ¿Qué diferencias notó entre los dos casos? ¿Puede explicar por qué?
+
+        La principal diferencia entre los dos casos es que en el primer caso, utilizando HTTP/1.0, la conexión se cierra automáticamente después de cada solicitud y respuesta, lo que significa que se necesita establecer una nueva conexión para cada solicitud adicional. En cambio, en el segundo caso, utilizando HTTP/1.1, la conexión se mantiene abierta para múltiples solicitudes y respuestas, lo que permite enviar varias solicitudes sin tener que establecer una nueva conexión cada vez.
+
+        Esta diferencia se debe a las mejoras introducidas en HTTP/1.1, que incluyen la capacidad de mantener conexiones persistentes (keep-alive) para mejorar el rendimiento y reducir la latencia al evitar la necesidad de establecer nuevas conexiones para cada solicitud. Esto es especialmente beneficioso cuando se solicitan múltiples recursos relacionados, como imágenes, hojas de estilo y scripts en una página web, ya que permite obtener todos los recursos necesarios sin tener que abrir y cerrar conexiones repetidamente.
+    - ### d. ¿Cuál de los dos casos le parece más eficiente? Piense en el ejercicio donde analizó la cantidad de requerimientos necesarios para obtener una página con estilos, javascripts e imágenes. El caso elegido, ¿puede traer asociado algún problema?
+        El caso más eficiente es el segundo caso, utilizando HTTP/1.1, ya que permite mantener la conexión abierta para múltiples solicitudes y respuestas, lo que reduce la latencia y mejora el rendimiento al evitar la necesidad de establecer nuevas conexiones para cada solicitud adicional. Esto es especialmente beneficioso cuando se solicitan múltiples recursos relacionados, como imágenes, hojas de estilo y scripts en una página web, ya que permite obtener todos los recursos necesarios sin tener que abrir y cerrar conexiones repetidamente.
+
+        Sin embargo, el uso de conexiones persistentes en HTTP/1.1 también puede traer asociado algunos problemas, como el consumo de recursos del servidor si hay muchas conexiones abiertas simultáneamente, lo que podría llevar a una sobrecarga del servidor. Además, si una conexión persistente se mantiene abierta durante mucho tiempo sin actividad, podría ser cerrada por el servidor o por un intermediario (como un firewall), lo que podría interrumpir la comunicación entre el cliente y el servidor. Por lo tanto, aunque HTTP/1.1 es más eficiente en términos de rendimiento, es importante gestionar adecuadamente las conexiones persistentes para evitar problemas de rendimiento y estabilidad en el servidor.
+
+17. ## En el siguiente ejercicio veremos la diferencia entre los métodos POST y GET. Para ello, será necesario utilizar la VM y la herramienta Wireshark. Antes de iniciar considere:
+    - ### Capture los paquetes utilizando la interfaz con IP 172.28.0.1. (Menú “Capture->Options”. Luego seleccione la interfaz correspondiente y presione Start).
+
+    - ### Para que el analizador de red sólo nos muestre los mensajes del protocolo http introduciremos la cadena ‘http’ (sin las comillas) en la ventana de especificación de filtros de visualización (display-filter). Si no hiciéramos esto veríamos todo el tráfico que es capaz de capturar nuestra placa de red. De los paquetes que son capturados, aquel que esté seleccionado será mostrado en forma detallada en la sección que está justo debajo. Como sólo estamos interesados en http ocultaremos toda la información que no es relevante para esta práctica (Información de trama, Ethernet, IP y TCP). Desplegar la información correspondiente al protocolo HTTP bajo la leyenda “Hypertext Transfer Protocol”.
+
+    - ### Para borrar la cache del navegador, deberá ir al menú “Herramientas->Borrar historial reciente”. Alternativamente puede utilizar Ctrl+F5 en el navegador para forzar la petición HTTP evitando el uso de caché del navegador.
+
+    - ### En caso de querer ver de forma simplificada el contenido de una comunicación http, utilice el botón derecho sobre un paquete HTTP perteneciente al flujo capturado y seleccione la opción Follow TCP Stream.
+        - #### a. Abra un navegador e ingrese a la URL: www.redes.unlp.edu.ar e ingrese al link en la sección “Capa de Aplicación” llamado “Métodos HTTP”. En la página mostrada se visualizan dos nuevos links llamados: Método GET y Método POST. Ambos muestran un formulario como el siguiente:
