@@ -384,3 +384,15 @@
 
     - ### En caso de querer ver de forma simplificada el contenido de una comunicación http, utilice el botón derecho sobre un paquete HTTP perteneciente al flujo capturado y seleccione la opción Follow TCP Stream.
         - #### a. Abra un navegador e ingrese a la URL: www.redes.unlp.edu.ar e ingrese al link en la sección “Capa de Aplicación” llamado “Métodos HTTP”. En la página mostrada se visualizan dos nuevos links llamados: Método GET y Método POST. Ambos muestran un formulario como el siguiente:
+            ![](../img/ej17a.png)
+        - #### b. Analice el código HTML
+            Ambos sitios muestran el formulario con el mismo código HTML, pero con una diferencia en el atributo method del tag form. En el caso del método GET, el atributo method está establecido como "GET" En cambio, en el caso del método POST, el atributo method está establecido como "POST".
+        - #### c. Utilizando el analizador de paquetes Wireshark capture los paquetes enviados y recibidos al presionar el botón Enviar.
+            - Metodo GET:
+                ![Metodo GET](../img/ej17c_1.png)
+            - Metodo POST:
+                ![Metodo POST](../img/ej17c_2.png)
+        - #### d. ¿Qué diferencias detectó en los mensajes enviados por el cliente?
+            En el metodo get los datos del formulario se envían como parte de la URL en la línea de inicio del mensaje HTTP, mientras que en el método POST los datos se envían en el cuerpo del mensaje HTTP. Además, en el método GET, los datos del formulario son visibles en la URL, lo que puede ser un problema de seguridad si se están enviando datos sensibles. En cambio, en el método POST, los datos no son visibles en la URL, lo que proporciona una mayor seguridad para la transmisión de datos sensibles.
+        - #### e. ¿Observó alguna diferencia en el browser si se utiliza un mensaje u otro?
+            Sí, al utilizar el método GET, los datos del formulario se envían como parte de la URL, lo que puede resultar en una URL más larga y menos legible. Además, si se envían datos sensibles, estos pueden ser visibles en la URL, lo que puede ser un problema de seguridad. En cambio, al utilizar el método POST, los datos se envían en el cuerpo del mensaje HTTP, lo que no afecta la URL y proporciona una mayor seguridad para la transmisión de datos sensibles. Por lo tanto, el método POST es generalmente preferido para enviar datos sensibles o grandes cantidades de datos a través de un formulario web.
