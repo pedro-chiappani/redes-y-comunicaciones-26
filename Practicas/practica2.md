@@ -396,3 +396,75 @@
             En el metodo get los datos del formulario se envían como parte de la URL en la línea de inicio del mensaje HTTP, mientras que en el método POST los datos se envían en el cuerpo del mensaje HTTP. Además, en el método GET, los datos del formulario son visibles en la URL, lo que puede ser un problema de seguridad si se están enviando datos sensibles. En cambio, en el método POST, los datos no son visibles en la URL, lo que proporciona una mayor seguridad para la transmisión de datos sensibles.
         - #### e. ¿Observó alguna diferencia en el browser si se utiliza un mensaje u otro?
             Sí, al utilizar el método GET, los datos del formulario se envían como parte de la URL, lo que puede resultar en una URL más larga y menos legible. Además, si se envían datos sensibles, estos pueden ser visibles en la URL, lo que puede ser un problema de seguridad. En cambio, al utilizar el método POST, los datos se envían en el cuerpo del mensaje HTTP, lo que no afecta la URL y proporciona una mayor seguridad para la transmisión de datos sensibles. Por lo tanto, el método POST es generalmente preferido para enviar datos sensibles o grandes cantidades de datos a través de un formulario web.
+
+18. ## Investigue cuál es el principal uso que se le da a las cabeceras Set-Cookie y Cookie en HTTP y qué relación tienen con el funcionamiento del protocolo HTTP.
+
+    La cabecera Set-Cookie se utiliza en HTTP para que el servidor pueda enviar una cookie al cliente. Esta cookie es un pequeño fragmento de información que el servidor desea almacenar en el navegador del cliente para identificarlo en futuras solicitudes. La cabecera Set-Cookie incluye el nombre de la cookie, su valor, y opcionalmente, atributos como la fecha de expiración, el dominio, la ruta y si la cookie debe ser segura o no.
+
+    Por otro lado, la cabecera Cookie se utiliza por parte del cliente para enviar las cookies almacenadas al servidor en cada solicitud subsiguiente. Cuando el cliente realiza una solicitud a un servidor, incluye en la cabecera Cookie todas las cookies que corresponden al dominio y la ruta del servidor. Esto permite al servidor identificar al cliente y mantener una sesión persistente entre las solicitudes.
+
+    La relación entre estas dos cabeceras es fundamental para el funcionamiento del protocolo HTTP, ya que HTTP es un protocolo sin estado (stateless), lo que significa que cada solicitud es independiente y no tiene conocimiento de las solicitudes anteriores. Las cookies permiten superar esta limitación al proporcionar un mecanismo para mantener el estado entre las solicitudes, lo que es esencial para funcionalidades como la autenticación de usuarios, la personalización de contenido y el seguimiento de sesiones en aplicaciones web.
+
+19. ## ¿Cuál es la diferencia entre un protocolo binario y uno basado en texto? ¿De qué tipo de protocolo se trata HTTP/1.0, HTTP/1.1 y HTTP/2?
+    Un protocolo binario es aquel en el que los mensajes se codifican en formato binario, lo que significa que los datos se representan como una secuencia de bits. En contraste, un protocolo basado en texto utiliza caracteres legibles por humanos para representar los mensajes, lo que facilita la lectura y depuración de las comunicaciones.
+
+    HTTP/1.0 y HTTP/1.1 son protocolos basados en texto, ya que utilizan líneas de texto para representar las solicitudes y respuestas HTTP, incluyendo los métodos, URLs, versiones del protocolo, encabezados y cuerpos de mensaje. Esto hace que sea fácil para los desarrolladores leer y entender las comunicaciones HTTP.
+
+    Por otro lado, HTTP/2 es un protocolo binario, lo que significa que las solicitudes y respuestas se codifican en formato binario. Esto permite una mayor eficiencia en la transmisión de datos, ya que el formato binario es más compacto y puede ser procesado más rápidamente por los servidores y clientes. Sin embargo, esto también hace que sea más difícil para los humanos leer y depurar las comunicaciones HTTP directamente, aunque existen herramientas que pueden decodificar el formato binario para facilitar su análisis.
+
+20. ## Responder las siguientes preguntas:
+    - ### a. ¿Qué función cumple la cabecera Host en HTTP 1.1? ¿Existía en HTTP 1.0? ¿Qué sucede en HTTP/2? (Ayuda: https://undertow.io/blog/2015/04/27/An-in-depth-overview-of-HTTP2.html para HTTP/2)
+
+        La cabecera Host en HTTP 1.1 se utiliza para especificar el nombre del host al que se está realizando la solicitud. Esto es necesario porque en HTTP 1.1, un servidor puede alojar múltiples sitios web (virtual hosting) en la misma dirección IP, y la cabecera Host permite al servidor identificar a cuál de esos sitios web se está dirigiendo la solicitud. En HTTP 1.0, esta cabecera no existía, lo que limitaba la capacidad de los servidores para alojar múltiples sitios web en la misma dirección IP.
+
+        En HTTP/2, la cabecera Host sigue siendo utilizada para identificar el host al que se está realizando la solicitud, pero también se introducen nuevas características como el uso de conexiones multiplexadas y la compresión de encabezados, lo que mejora el rendimiento y la eficiencia en la transmisión de datos entre el cliente y el servidor.
+
+    - ### b. En HTTP/1.1, ¿es correcto el siguiente requerimiento?
+        ```
+        GET /index.php HTTP/1.1
+        User-Agent: curl/7.54.0
+        ```
+        No, no es correcto porque falta la cabecera Host, que es obligatoria en HTTP/1.1. La cabecera Host debe especificar el nombre del host al que se está realizando la solicitud para que el servidor pueda identificar a cuál sitio web se está dirigiendo la solicitud. Sin la cabecera Host, el servidor no podrá procesar correctamente la solicitud y probablemente devolverá un error.
+
+    - ### c. ¿Cómo quedaría en HTTP/2 el siguiente pedido realizado en HTTP/1.1 si se está usando https?
+        ```
+        GET /index.php HTTP/1.1
+        Host: www.info.unlp.edu.ar
+        ```
+
+        En HTTP/2, el pedido se mantendría similar en cuanto a su estructura, pero se codificaría en formato binario. Además, al usar HTTPS, la comunicación estaría cifrada utilizando TLS (Transport Layer Security). El pedido en HTTP/2 podría verse así:
+
+        ```
+        :method: GET
+        :scheme: https
+        :authority: www.info.unlp.edu.ar
+        :path: /index.php
+        ```
+
+21. ## Ejercicio de Parcial
+    ```
+    curl -X ?? www.redes.unlp.edu.ar/??
+    > HEAD /metodos/ HTTP/??
+    > Host: www.redes.unlp.edu.ar
+    > User-Agent: curl/7.54.0
+    < HTTP/?? 200 OK
+    < Server: nginx/1.4.6 (Ubuntu)
+    < Date: Wed, 31 Jan 2018 22:22:22 GMT
+    < Last-Modified: Sat, 20 Jan 2018 13:02:41 GMT
+    < Content-Type: text/html; charset=UTF-8
+    < Connection: close
+    ```
+    - ### a. ¿Qué versión de HTTP podría estar utilizando el servidor?
+        Esta utilizando la version HTTP/1.1 ya que el servidor responde con un código de estado 200 OK, lo que indica que la solicitud fue procesada correctamente. Además, la presencia de la cabecera Host en la solicitud sugiere que se está utilizando HTTP/1.1, ya que esta cabecera es obligatoria en esa versión del protocolo.
+    - ### b. ¿Qué método está utilizando? Dicho método, ¿retorna el recurso completo solicitado?
+        Esta utilizando el metodo HEAD, el cual no retorna el recurso completo solicitado, sino que solo devuelve los encabezados de la respuesta sin el cuerpo del mensaje. Esto es útil para obtener información sobre el recurso sin tener que descargarlo completamente, lo que puede ser beneficioso para verificar la existencia de un recurso o para obtener metadatos sin incurrir en el costo de descargar el contenido completo.
+
+    - ### c. ¿Cuál es el recurso solicitado?
+
+        Se solicita el recurso ubicado en la URL www.redes.unlp.edu.ar/metodos/. Este recurso podría ser una página web, un archivo o cualquier otro tipo de contenido que el servidor tenga disponible en esa ruta específica.
+    - ### d. ¿El método funcionó correctamente?
+        Sí, el método funcionó correctamente, ya que el servidor respondió con un código de estado 200 OK, lo que indica que la solicitud fue procesada exitosamente y que el recurso solicitado existe en el servidor. Aunque el método HEAD no devuelve el cuerpo del mensaje, la respuesta indica que el recurso está disponible y se puede acceder a él utilizando un método como GET si se desea obtener el contenido completo.
+    - ### e. Si la solicitud hubiera llevado un encabezado que diga: If-Modified-Since: Sat, 20 Jan 2018 13:02:41 GMT ¿Cuál habría sido la respuesta del servidor web? ¿Qué habría hecho el navegador en este caso?
+        Si la solicitud hubiera incluido el encabezado If-Modified-Since con la fecha Sat, 20 Jan 2018 13:02:41 GMT, el servidor web habría comparado esa fecha con la fecha de última modificación del recurso solicitado. Dado que la fecha de última modificación del recurso es exactamente Sat, 20 Jan 2018 13:02:41 GMT, el servidor habría respondido con un código de estado 304 Not Modified, indicando que el recurso no ha sido modificado desde la fecha especificada.
+
+        En este caso, el navegador habría interpretado la respuesta 304 Not Modified como una señal de que puede utilizar la versión en caché del recurso sin necesidad de descargarlo nuevamente. Esto optimiza el rendimiento al evitar la transferencia de datos innecesarios cuando el recurso no ha cambiado desde la última vez que fue solicitado.
