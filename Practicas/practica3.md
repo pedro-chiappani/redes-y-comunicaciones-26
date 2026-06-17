@@ -101,27 +101,139 @@
 
     - ### a. En la VM, utilice el comando dig para obtener la dirección IP del host <www.redes.unlp.edu.ar> y responda
 
+        ``` bash
+        dig www.redes.unlp.edu.ar
+
+        ; <<>> DiG 9.16.27-Debian <<>> www.redes.unlp.edu.ar
+        ;; global options: +cmd
+        ;; Got answer:
+        ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 31965
+        ;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+        ;; OPT PSEUDOSECTION:
+        ; EDNS: version: 0, flags:; udp: 1232
+        ; COOKIE: 421d32ee557125dc010000006a32ceb4ef70070642f2a4d4 (good)
+        ;; QUESTION SECTION:
+        ;www.redes.unlp.edu.ar.		IN	A
+
+        ;; ANSWER SECTION:
+        www.redes.unlp.edu.ar.	300	IN	A	172.28.0.50
+
+        ;; Query time: 4 msec
+        ;; SERVER: 172.28.0.29#53(172.28.0.29)
+        ;; WHEN: Wed Jun 17 13:43:32 -03 2026
+        ;; MSG SIZE  rcvd: 94
+        ```
         - #### i. ¿La solicitud fue recursiva? ¿Y la respuesta? ¿Cómo lo sabe?
+
+            Si, la solicitud fue recursiva ya que el flag rd (recursion desired) está presente en la respuesta. La respuesta también es recursiva, dado que el flag ra (recursion available) también está presente.
 
         - #### ii. ¿Puede indicar si se trata de una respuesta autoritativa? ¿Qué significa que lo sea?
 
+            Sí, se trata de una respuesta autoritativa, dado que el flag aa (authoritative answer) está presente en la respuesta. Esto significa que el servidor DNS que respondió a la consulta es el servidor autoritativo para el dominio www.redes.unlp.edu.ar, lo que implica que tiene la información más actualizada y confiable sobre ese dominio.
+
         - #### iii. ¿Cuál es la dirección IP del resolver utilizado? ¿Cómo lo sabe?
+
+            La dirección IP del resolver utilizado es 172.28.0.29. Esto se puede saber porque en la sección "SERVER" de la respuesta se indica que el servidor que respondió a la consulta es 172.28.0.29.
 
     - ### b. ¿Cuáles son los servidores de correo del dominio redes.unlp.edu.ar? ¿Por qué hay más de uno y qué significan los números que aparecen entre MX y el nombre? Si se quiere enviar un correo destinado a redes.unlp.edu.ar, ¿a qué servidor se le entregará? ¿En qué situación se le entregará al otro?
 
+        ```bash
+        dig mx redes.unlp.edu.ar +short
+
+        5 mail.redes.unlp.edu.ar.
+        10 mail2.redes.unlp.edu.ar.
+        ```
+
+        Los servidores de correo del dominio redes.unlp.edu.ar son mail.redes.unlp.edu.ar y mail2.redes.unlp.edu.ar. Hay más de uno para garantizar la disponibilidad y redundancia en caso de que uno de los servidores falle. Los números que aparecen entre MX y el nombre indican la prioridad del servidor de correo, siendo el número más bajo el de mayor prioridad. Si se quiere enviar un correo destinado a redes.unlp.edu.ar, se le entregará al servidor mail.redes.unlp.edu.ar, ya que tiene la prioridad más alta (5). Si ese servidor no está disponible, entonces se le entregará al otro servidor mail2.redes.unlp.edu.ar, que tiene una prioridad de 10.
+
     - ### c. ¿Cuáles son los servidores de DNS del dominio redes.unlp.edu.ar?
+
+        ```bash
+        dig ns redes.unlp.edu.ar +short
+
+         <<>> DiG 9.16.27-Debian <<>> ns redes.unlp.edu.ar
+        ;; global options: +cmd
+        ;; Got answer:
+        ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 53762
+        ;; flags: qr aa rd ra; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 3
+
+        ;; OPT PSEUDOSECTION:
+        ; EDNS: version: 0, flags:; udp: 1232
+        ; COOKIE: 44e2d76afeea13e7010000006a32d0e48f9bc325212df687 (good)
+        ;; QUESTION SECTION:
+        ;redes.unlp.edu.ar.		IN	NS
+
+        ;; ANSWER SECTION:
+        redes.unlp.edu.ar.	86400	IN	NS	ns-sv-b.redes.unlp.edu.ar.
+        redes.unlp.edu.ar.	86400	IN	NS	ns-sv-a.redes.unlp.edu.ar.
+
+        ;; ADDITIONAL SECTION:
+        ns-sv-a.redes.unlp.edu.ar. 604800 IN	A	172.28.0.30
+        ns-sv-b.redes.unlp.edu.ar. 604800 IN	A	172.28.0.29
+
+        ;; Query time: 4 msec
+        ;; SERVER: 172.28.0.29#53(172.28.0.29)
+        ;; WHEN: Wed Jun 17 13:52:52 -03 2026
+        ;; MSG SIZE  rcvd: 150
+
+        ```
 
     - ### d. Repita la consulta anterior cuatro veces más. ¿Qué observa? ¿Puede explicar a qué se debe?
 
+        Se puede observar:
+
+        - Cambia el ID de la consulta
+        - Cambuia el orden de los servidores de DNS que aparecen en la respuesta
+        - Cammbia COOKIE
+        - El TTL y NS son los mismos
+        - Cambia el valor When de la consutla
+        - Cmabia el Query time
+
+        Esto se debe a que el servidor DNS está utilizando un mecanismo de balanceo de carga para distribuir las consultas entre los servidores de DNS disponibles. Al cambiar el orden de los servidores de DNS en la respuesta, el servidor DNS puede dirigir las consultas a diferentes servidores en cada consulta, lo que ayuda a distribuir la carga y mejorar el rendimiento del sistema DNS. Además, el cambio en el ID de la consulta y la COOKIE es parte del proceso normal de generación de consultas DNS para garantizar la seguridad y la integridad de las respuestas.
+
     - ### e. Observe la información que obtuvo al consultar por los servidores de DNS del dominio. En base a la salida, ¿es posible indicar cuál de ellos es el primario?
+
+        No, no es posible indicar cuál de los servidores de DNS es el primario solo con la información obtenida al consultar por los servidores de DNS del dominio. La consulta por los servidores de DNS (registro NS) solo proporciona información sobre los servidores que están autorizados para el dominio, pero no indica cuál de ellos es el primario o maestro. Para determinar cuál es el servidor primario, se necesitaría consultar el registro SOA (Start of Authority) del dominio, que contiene información sobre el servidor primario y otros detalles relacionados con la zona DNS.
 
     - ### f. Consulte por el registro SOA del dominio y responda
 
+        ```bash
+        redes@debian:~$ dig soa redes.unlp.edu.ar
+
+        ; <<>> DiG 9.16.27-Debian <<>> soa redes.unlp.edu.ar
+        ;; global options: +cmd
+        ;; Got answer:
+        ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 62922
+        ;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+        ;; OPT PSEUDOSECTION:
+        ; EDNS: version: 0, flags:; udp: 1232
+        ; COOKIE: 9c32fc9c6b3ef0c1010000006a32d244730fd906c6047124 (good)
+        ;; QUESTION SECTION:
+        ;redes.unlp.edu.ar.		IN	SOA
+
+        ;; ANSWER SECTION:
+        redes.unlp.edu.ar.	86400	IN	SOA	ns-sv-b.redes.unlp.edu.ar. root.redes.unlp.edu.ar. 2020031700 604800 86400 2419200 86400
+
+        ;; Query time: 4 msec
+        ;; SERVER: 172.28.0.29#53(172.28.0.29)
+        ;; WHEN: Wed Jun 17 13:58:44 -03 2026
+        ;; MSG SIZE  rcvd: 123
+        ```
+
+
         - #### i. ¿Puede ahora determinar cuál es el servidor de DNS primario?
+
+            Sí, ahora se puede determinar que el servidor de DNS primario es ns-sv-b.redes.unlp.edu.ar, ya que es el servidor que aparece en el registro SOA como el servidor de nombres principal para la zona redes.unlp.edu.ar.
 
         - #### ii. ¿Cuál es el número de serie, qué convención sigue y en qué casos es importante actualizarlo?
 
+            El número de serie es 2020031700. La convención que sigue es YYYYMMDDNN, donde YYYY es el año, MM es el mes, DD es el día y NN es un número de dos dígitos que se incrementa cada vez que se realiza una actualización en el mismo día. Es importante actualizar el número de serie cada vez que se realice un cambio en la zona DNS, ya que los servidores secundarios utilizan este número para determinar si necesitan actualizar su copia de la zona. Si el número de serie no se actualiza correctamente, los servidores secundarios pueden no recibir las actualizaciones y servir información obsoleta a los clientes.
+
         - #### iii. ¿Qué valor tiene el segundo campo del registro? Investigue para qué se usa y cómo se interpreta el valor.
+
+
 
         - #### iv. ¿Qué valor tiene el TTL de caché negativa y qué significa?
 
