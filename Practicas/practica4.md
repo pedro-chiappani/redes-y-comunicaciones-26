@@ -253,13 +253,129 @@
     - Archivo adjunto: PDF del enunciado de la práctica
     - Cuerpo del mensaje: Esto es una prueba del protocolo SMTP
 
+    `swaks --to alumnoimap@redes.unlp.edu.ar --server mail.redes.unlp.edu.ar --from redesycomunicaciones@redes.unlp.edu.ar --h-Subject SMTP-Practica4 --attach Desktop/Practica4-Mail.pdf --body "Esto es una prueba del protocolo SMTP" >> Desktop/salida_swaks.log`
+
     - ### a. Analice tanto la salida del comando swaks como los fuentes del mensaje recibido para responder las siguientes preguntas:
         - #### i. ¿A qué corresponde la información enviada por el servidor destino como respuesta al comando EHLO? Elija dos de las opciones del listado e investigue la funcionalidad de la misma.
+
+            ```text
+            -> EHLO debian
+            <-  250-mail.redes.unlp.edu.ar
+            <-  250-PIPELINING
+            <-  250-SIZE 10240000
+            <-  250-VRFY
+            <-  250-ETRN
+            <-  250-STARTTLS
+            <-  250-ENHANCEDSTATUSCODES
+            <-  250-8BITMIME
+            <-  250-DSN
+            <-  250 CHUNKING
+            ```
+
+            - 250-PIPELINING: Esta opción indica que el servidor de correo soporta la funcionalidad de "pipelining", lo que permite al cliente enviar múltiples comandos SMTP sin esperar la respuesta de cada uno. Esto mejora la eficiencia de la comunicación entre el cliente y el servidor, reduciendo la latencia y acelerando el proceso de envío de correos electrónicos.
+            - 250-STARTTLS: Esta opción indica que el servidor de correo soporta la funcionalidad de "STARTTLS", lo que permite al cliente iniciar una conexión segura mediante el protocolo TLS (Transport Layer Security). Esto garantiza que los datos transmitidos entre el cliente y el servidor estén cifrados, protegiendo la información sensible, como credenciales y contenido del correo electrónico, contra posibles ataques de interceptación.
+
         - #### ii. Indicar cuáles cabeceras fueron agregadas por la herramienta swaks.
+
+            Añade las siguientes cabeceras al correo electrónico:
+
+            - `Date: Fri, 19 Jun 2026 17:59:48 -0300`
+            - `Message-Id: <20260619175948.003996@debian>`
+            - `X-Mailer: swaks v20201014.0 jetmore.org/john/code/swaks/`
+            - `Content-Type: multipart/mixed; boundary="----=_MIME_BOUNDARY_000_3996"`
+
         - #### iii. ¿Cuál es el message-id del correo enviado? ¿Quién asigna dicho valor?
+
+            El message-id del correo enviado es `<20260619175948.003996@debian>`. Este valor es asignado por el servidor de correo que procesa el mensaje, en este caso, el servidor de correo de origen (mail.redes.unlp.edu.ar). El message-id es un identificador único que permite rastrear y referenciar el correo electrónico en futuras comunicaciones o respuestas.
+
         - #### iv. ¿Cuál es el software utilizado como servidor de correo electrónico?
+
+            El software utilizado como servidor de correo electrónico es Postfix, que es un agente de transferencia de correo (MTA) ampliamente utilizado en sistemas Unix y Linux. Postfix es conocido por su seguridad, rendimiento y facilidad de configuración, lo que lo convierte en una opción popular para la gestión del correo electrónico en servidores.
+
         - #### v. Adjunte la salida del comando swaks y los fuentes del correo electrónico.
     - ### b. Descargue de la plataforma la captura de tráfico smtp.pcap y la salida del comando swaks smtp.swaks para responder y justificar los siguientes ejercicios.
         - #### i. ¿Por qué el contenido del mail no puede ser leído en la captura de tráfico?
+
+            Ya que la comunicación está encriptada utilizando TLS (STARTTLS), el contenido del correo electrónico no puede ser leído en la captura de tráfico. TLS cifra los datos transmitidos entre el cliente y el servidor, lo que protege la información sensible contra posibles ataques de interceptación. Por lo tanto, aunque se pueda observar la comunicación SMTP en la captura de tráfico, el contenido del correo electrónico estará cifrado y no será legible.
     - ### c. Realice una consulta de DNS por registros TXT al dominio info.unlp.edu.ar y entre dichos registros evalúe la información del registro SPF. ¿Por qué cree que aparecen muchos servidores autorizados?
+
+        `info.unlp.edu.ar.	300	IN	TXT	"v=spf1 mx a:smtp.info.unlp.edu.ar a:mailsecure.info.unlp.edu.ar a:mail3.info.unlp.edu.ar a:listas.extension.info.unlp.edu.ar a:mail-app.info.unlp.edu.ar a:biblioteca.info.unlp.edu.ar a:catedras.info.unlp.edu.ar a:moodle.linti.unlp.edu.ar ~all"`
+
+        Aparecen muchos servidores autorizados en el registro SPF de info.unlp.edu.ar porque la Universidad Nacional de La Plata (UNLP) probablemente utiliza múltiples servidores de correo para manejar el tráfico de correo electrónico de su dominio. Esto puede incluir servidores dedicados para diferentes departamentos, servicios específicos (como listas de correo o plataformas educativas) o servidores de respaldo para garantizar la disponibilidad del servicio de correo electrónico. Al incluir todos estos servidores en el registro SPF, se asegura que los correos electrónicos enviados desde cualquiera de estos servidores sean reconocidos como legítimos por otros servidores de correo que realizan verificaciones SPF.
+
     - ### d. Realice una consulta de DNS por registros TXT al dominio outlook.com y analice el registro correspondiente a SPF. ¿Cuáles son los bloques de red autorizados para enviar mails?. Investigue para qué se utiliza la directiva "~all"
+
+        `outlook.com.		300	IN	TXT	"v=spf1 include:spf2.outlook.com -all"`
+
+        El registro SPF de outlook.com incluye la directiva "include:spf2.outlook.com", lo que significa que los bloques de red autorizados para enviar correos electrónicos en nombre de outlook.com son aquellos definidos en el registro SPF del dominio spf2.outlook.com. Para conocer los bloques de red autorizados, se debería realizar una consulta DNS adicional para obtener el registro SPF de spf2.outlook.com.
+        La directiva "~all" en un registro SPF indica que los correos electrónicos que no provengan de los servidores autorizados deben ser tratados como "soft fail". Esto significa que los correos electrónicos que no cumplan con las reglas del registro SPF no serán rechazados automáticamente, pero se marcarán como sospechosos o potencialmente fraudulentos. Los servidores de correo receptores pueden optar por aceptar estos correos electrónicos, pero podrían aplicar medidas adicionales de filtrado o marcar el correo como spam.
+
+12. ## Observar el gráfico a continuación y teniendo en cuenta lo siguiente , responder:
+
+    ![](../img/p4ej12.png)
+
+    - El usuario juan@misitio.com.ar en PC-A desea enviar un mail al usuario alicia@example.com
+    - Cada organización tiene su propios servidores de DNS y Mail
+    - El servidor ns1 de misitio.com.ar no tiene la recursión habilitada
+    - Los hosts del dominio misitio.com.ar utilizan como servidor recursivo el 8.8.8.8 (DNS de Google)
+
+    - ### a. El servidor de mail, mail1, y de HTTP, www, de example.com tienen la misma IP, ¿es posible esto? Si lo es, ¿cómo lo resolvería?
+
+        Sí, es posible que el servidor de mail (mail1) y el servidor HTTP (www) de example.com tengan la misma IP. Esto se puede resolver utilizando diferentes puertos para cada servicio. Por ejemplo, el servidor HTTP podría escuchar en el puerto 80 (HTTP) o 443 (HTTPS), mientras que el servidor de correo podría escuchar en el puerto 25 (SMTP) para el envío de correos y en los puertos 110 (POP3) o 143 (IMAP) para la recepción de correos. De esta manera, aunque ambos servicios compartan la misma dirección IP, los clientes pueden acceder a cada servicio utilizando el puerto correspondiente.
+
+    - ### b. Al enviar el mail, ¿por cuál registro de DNS consultará el MUA?
+
+        Al enviar el mail, el MUA (Mail User Agent) consultará el registro A del dominio example.com para obtener la dirección IP del servidor de correo (mail1) al que debe enviar el correo electrónico.
+
+    - ### c. Una vez que el mail fue recibido por el servidor smtp-5, ¿por qué registro de DNS consultará?
+
+        Una vez que el mail fue recibido por el servidor smtp-5, este consultará el registro MX (Mail Exchange) del dominio example.com para determinar cuál es el servidor de correo responsable de recibir los correos electrónicos para ese dominio. El registro MX proporcionará la dirección del servidor de correo (mail1) al que smtp-5 debe entregar el correo electrónico.
+
+    - ### d. Si en el punto anterior smtp-5 recibiese un listado de nombres de servidores de correo, ¿será necesario realizar una consulta de DNS adicional? Si es afirmativo, ¿por qué tipo de registro y de cuál servidor preguntaría?
+
+        Sí, si smtp-5 recibiese un listado de nombres de servidores de correo en el registro MX, sería necesario realizar una consulta de DNS adicional para cada uno de esos nombres de servidores. La consulta sería por el registro A (Address) para obtener la dirección IP correspondiente a cada nombre de servidor de correo. Esto es necesario porque el registro MX solo proporciona los nombres de los servidores de correo, y smtp-5 necesita las direcciones IP para poder establecer la conexión y entregar el correo electrónico a los servidores correspondientes.
+
+    - ### e. Indicar todo el proceso que deberá realizar el servidor ns1 de misitio.com.ar para obtener los servidores de mail de example.com.
+
+        El servidor ns1 actua como servidor de DNS y realiza las consultas en nombre de smtp-5 para obtener los servidores de mail de example.com. El proceso sería el siguiente:
+
+        1. Consulta al root server mas cercano para obtener los servidores de nombres autoritativos para el dominio .com. (b.root-servers.net) este me contesta con los servidores de nombres autoritativos para el dominio .com (c.gtld-servers.net).
+
+        2. Consulta al servidor de nombres autoritativo para el dominio .com (c.gtld-servers.net) para obtener los servidores de nombres autoritativos para el dominio example.com.
+
+        3. Consulta al servidor de nombres autoritativo para el dominio example.com (ns1.example.com) para obtener el registro MX que contiene los servidores de mail de example.com.
+
+    - ### f. Teniendo en cuenta el proceso de encapsulación/desencapsulación y definición de protocolos, responder V o F y justificar:
+        - Los datos de la cabecera de SMTP deben ser analizados por el servidor DNS para responder a la consulta de los registros MX
+
+            - Falso. El servidor DNS no analiza las cabeceras de SMTP para responder a la consulta de los registros MX. El servidor DNS se encarga de resolver nombres de dominio a direcciones IP y proporcionar información sobre los servidores de correo (registros MX) sin necesidad de analizar las cabeceras de SMTP. Las cabeceras de SMTP son procesadas por el servidor de correo (MTA) para gestionar el envío y recepción de correos electrónicos, pero no influyen en la resolución de nombres realizada por el servidor DNS.
+
+        - Al ser recibidos por el servidor smtp-5 los datos agregados por el protocolo SMTP serán analizados por cada una de las capas inferiores
+
+            - Falso. Los datos agregados por el protocolo SMTP no son analizados por cada una de las capas inferiores. En el modelo OSI o TCP/IP, cada capa tiene su propio conjunto de protocolos y funciones específicas. El protocolo SMTP opera en la capa de aplicación y se encarga de gestionar el envío de correos electrónicos. Las capas inferiores, como la capa de transporte (TCP) y la capa de red (IP), se encargan de la transmisión de los datos a través de la red, pero no analizan ni procesan los datos específicos del protocolo SMTP. Cada capa solo se ocupa de su propia función y no analiza los datos de las capas superiores.
+
+        - Cada protocolo de la capa de aplicación agrega una cabecera con información propia de ese protocolo
+
+            - Verdadero. Cada protocolo de la capa de aplicación agrega una cabecera con información específica de ese protocolo. Por ejemplo, el protocolo SMTP agrega cabeceras como "From", "To", "Subject", etc., que contienen información relevante para el envío de correos electrónicos. De manera similar, el protocolo HTTP agrega cabeceras como "Host", "User-Agent", "Content-Type", etc., que contienen información relevante para la comunicación web. Estas cabeceras son utilizadas por los servidores y clientes para procesar y gestionar las solicitudes y respuestas de acuerdo con las reglas del protocolo correspondiente.
+
+        - Como son todos protocolos de la capa de aplicación, las cabeceras agregadas por el protocolo de DNS puede ser analizadas y comprendidas por el protocolo SMTP o HTTP
+
+            - Falso. Las cabeceras agregadas por el protocolo de DNS no pueden ser analizadas ni comprendidas por el protocolo SMTP o HTTP, ya que cada protocolo tiene su propio formato y conjunto de cabeceras específicas. El protocolo DNS se encarga de resolver nombres de dominio y proporcionar información sobre servidores, mientras que SMTP y HTTP se encargan de gestionar la comunicación de correos electrónicos y solicitudes web, respectivamente. Cada protocolo opera de manera independiente y no analiza las cabeceras de otros protocolos de la capa de aplicación.
+
+        - Para que los cliente en misitio.com.ar puedan acceder el servidor HTTP www.example.com y mostrar correctamente su contenido deben tener el mismo sistema operativo.
+
+            - Falso. Para que los clientes en misitio.com.ar puedan acceder al servidor HTTP www.example.com y mostrar correctamente su contenido, no es necesario que tengan el mismo sistema operativo. El protocolo HTTP es independiente del sistema operativo y puede ser utilizado por cualquier cliente que tenga un navegador web compatible, independientemente del sistema operativo que estén utilizando. Lo importante es que el cliente pueda establecer una conexión con el servidor HTTP y procesar las respuestas recibidas, lo cual es posible en una amplia variedad de sistemas operativos.
+
+    - ### g. Un cliente web que desea acceder al servidor www.example.com y que no pertenece a ninguno de estos dos dominios puede usar a ns1 de misitio.com.ar como servidor de DNS para resolver la consulta?
+
+        No, un cliente web que desea acceder al servidor www.example.com y que no pertenece a ninguno de estos dos dominios no puede usar a ns1 de misitio.com.ar como servidor de DNS para resolver la consulta. Esto se debe a que el servidor ns1 no es un servidor autoritativo para el dominio example.com y no tiene la recursión habilitada. Por lo tanto, no podrá resolver la consulta para obtener la dirección IP del servidor www.example.com. En su lugar, el cliente web debería utilizar un servidor de DNS recursivo, como el servidor de DNS de Google.
+
+    - ### h. Cuando Alicia quiera ver sus mails desde PC-D, ¿qué registro de DNS deberá consultarse?
+
+        Cuando Alicia quiera ver sus mails desde PC-D no deberá consultar a ningun registro DNS sino que deberá conectarse al servidor de correo (mail1) utilizando el protocolo IMAP o POP3 para acceder a sus correos electrónicos. El cliente de correo en PC-D se configurará con la dirección del servidor de correo (mail1) y las credenciales de Alicia para autenticar su acceso y permitirle gestionar sus correos electrónicos.
+
+    - ### i. Indicar todos los protocolos de mail involucrados, puerto y si usan TCP o UDP, en el envío y recepción de dicho mail
+
+        - SMTP: Puerto 25, utiliza **TCP** para el envío de correos electrónicos desde el cliente (MUA) al servidor de correo (MTA) y entre servidores de correo (MTA a MTA).
+        - IMAP: Puerto 143, utiliza **TCP** para la recepción de correos electrónicos desde el servidor de correo (MTA) al cliente (MUA) y para la gestión de correos electrónicos en el servidor.
+        - POP3: Puerto 110, utiliza **TCP** para la recepción de correos electrónicos desde el servidor de correo (MTA) al cliente (MUA) y para la descarga de correos electrónicos al cliente.
